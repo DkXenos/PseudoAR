@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pseudo-AR MMD Character</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: #000;
+        }
+
+        /* Webcam video layer - mirrored */
+        #webcam {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            z-index: 1;
+        }
+
+        /* Three.js canvas overlay - transparent */
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Hand tracking canvas overlay */
+        #hand-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            transform: scaleX(-1);
+        }
+
+        /* Debug info overlay */
+        #debug-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: monospace;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* Loading indicator */
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            z-index: 4;
+            display: none;
+        }
+
+        /* Start screen overlay */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #start-screen h1 {
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        #start-screen p {
+            color: rgba(255,255,255,0.9);
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+
+        #start-button {
+            padding: 20px 60px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            background: rgba(255,255,255,0.2);
+            border: 3px solid white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: Arial, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #start-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #start-button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <!-- Start screen overlay -->
+    <div id="start-screen">
+        <h1>🎭 Pseudo-AR MMD</h1>
+        <p>Experience interactive 3D anime characters with hand tracking.<br>Click START to allow camera access and begin.</p>
+        <button id="start-button">Start</button>
+    </div>
+
+    <!-- Webcam video feed -->
+    <video id="webcam" autoplay playsinline></video>
+    
+    <!-- Hand tracking visualization canvas -->
+    <canvas id="hand-canvas"></canvas>
+    
+    <!-- Three.js canvas container -->
+    <div id="canvas-container"></div>
+    
+    <!-- Debug information -->
+    <div id="debug-info">
+        <div>Hand Detected: <span id="hand-status">No</span></div>
+        <div>Index Finger: <span id="finger-pos">N/A</span></div>
+        <div>3D Position: <span id="3d-pos">N/A</span></div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading">Loading...</div>
+
+    <!-- Three.js Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <!-- Application modules -->
+    <script src="/static/js/sceneManager.js"></script>
+    <script src="/static/js/handTracking.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
